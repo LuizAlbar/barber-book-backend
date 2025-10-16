@@ -5,6 +5,7 @@ import jwt from "@fastify/jwt";
 
 import { signupRoute} from "./routes/auth/signup";
 import { loginRoute } from "./routes/auth/login";
+import { createBarbershopRoute } from "./routes/barbershop/barbershop";
 
 
 
@@ -23,6 +24,7 @@ export async function buildApp() {
 
     app.register(signupRoute);
     app.register(loginRoute);
+    app.register(createBarbershopRoute);
 
     return app;
 }
