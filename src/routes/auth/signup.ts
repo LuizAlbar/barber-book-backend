@@ -14,6 +14,14 @@ export async function signupRoute(app: FastifyInstance, options: FastifyPluginOp
     try {
       const { name, email, password } = createUserSchema.parse(request.body);
 
+      const existingUser = await prisma.user.findUnique({
+        where: { email }
+      });
+
+      if (existingUser) {
+        return ResponseHandler.error(reply, 409, 'Email already exists', { email: 'Email already in use' });
+      }
+
       const passwordHash = await hash(password, 12);
 
       const user = await prisma.user.create({
@@ -24,7 +32,7 @@ export async function signupRoute(app: FastifyInstance, options: FastifyPluginOp
         },
       });
 
-      return ResponseHandler.createSuccess(user.email, user.id, user);
+      return ResponseHandler.createSuccess(reply, user.email, user.id, user);
     } catch (error) {
       if (error instanceof ZodError) {
         const invalidFields = error.issues.map(err => ({

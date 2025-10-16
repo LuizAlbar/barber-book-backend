@@ -1,36 +1,36 @@
 export default class ResponseHandler {
 
-  static success(message: string, data: any = null, statusCode: number = 200) {
-    return { success: true, statusCode, message, data };
+  static success(reply: any, message: string, data: any = null, statusCode: number = 200) {
+    return reply.status(statusCode).send({ success: true, code: statusCode, message, data });
   }
 
 
-  static getSingleSuccess(name: string, id: any, data: any) {
+  static getSingleSuccess(reply: any, name: string, id: any, data: any) {
     const message = `Details for ${name} with id ${id}`;
-    return this.success(message, data, 200);
+    return this.success(reply, message, data, 200);
   }
 
 
-  static getAllSuccess(object: string, data: any) {
+  static getAllSuccess(reply: any, object: string, data: any) {
     const message = `Details for all ${object}s`;
-    return this.success(message, data, 200);
+    return this.success(reply, message, data, 200);
   }
 
-  static createSuccess(name: string, id: any, data: any) {
+  static createSuccess(reply: any, name: string, id: any, data: any) {
     const message = `${name} with id ${id} created successfully`;
-    return this.success(message, data, 201);
+    return this.success(reply, message, data, 201);
   }
 
 
-  static updateSuccess(name: string, id: any, data: any) {
+  static updateSuccess(reply: any, name: string, id: any, data: any) {
     const message = `${name} with id ${id} updated successfully`;
-    return this.success(message, data, 200);
+    return this.success(reply, message, data, 200);
   }
 
  
-  static deleteSuccess(name: string, id: any, data: any) {
+  static deleteSuccess(reply: any, name: string, id: any, data: any) {
     const message = `${name} with id ${id} deleted successfully`;
-    return this.success(message, data, 200);
+    return this.success(reply, message, data, 200);
   }
 
   
@@ -94,7 +94,7 @@ export default class ResponseHandler {
   static error(reply: any, status: number, message: string, details?: any) {
     return reply.status(status).send({
       success: false,
-      statusCode: status,
+      code: status,
       error: message,
       details
     });
