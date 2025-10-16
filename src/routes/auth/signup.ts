@@ -5,14 +5,14 @@ import  ResponseHandler  from '../../utils/response-handler';
 
 import { prisma } from '../../database/prisma-service';
 
-import { createUserSchema } from '../../schemas/user/user-schema';
+import { signupUserSchema } from '../../schemas/user/user-schema';
 import { ZodError } from 'zod';
 
 
 export async function signupRoute(app: FastifyInstance, options: FastifyPluginOptions) {
   app.post('/signup', async (request, reply) => {
     try {
-      const { name, email, password } = createUserSchema.parse(request.body);
+      const { name, email, password } = signupUserSchema.parse(request.body);
 
       const existingUser = await prisma.user.findUnique({
         where: { email }
