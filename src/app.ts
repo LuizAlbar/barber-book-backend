@@ -3,6 +3,10 @@ import helmet from "@fastify/helmet";
 import cors from "@fastify/cors";
 import jwt from "@fastify/jwt";
 
+import { signupRoute} from "./routes/auth/signup";
+
+
+
 export async function buildApp() {
     const app  = Fastify({
         logger: true,
@@ -15,6 +19,8 @@ export async function buildApp() {
     await app.register(jwt, {
         secret: process.env.JWT_SECRET || "jwt"
     });
+
+    app.register(signupRoute);
 
     return app;
 }
