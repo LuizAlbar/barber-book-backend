@@ -1,0 +1,109 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum ROLE {
+  BARBEIRO
+  ATENDENTE
+}
+
+enum APPOINTMENT_STATUS {
+  PENDENTE
+  COMPLETO
+}
+
+model User {
+  id           String       @id @default(uuid())
+  name         String
+  email        String       @unique
+  password     String
+  created_at   DateTime     @default(now())
+  updated_at   DateTime     @updatedAt
+
+  barbershops  Barbershop[]
+}
+
+model Barbershop {
+  id             String       @id @default(uuid())
+  name           String
+  address        String
+  address_number String 
+  neighbourhood  String
+  landmark       String?
+
+  created_at     DateTime     @default(now())
+  updated_at     DateTime     @updatedAt
+
+  owner_id       String
+  user           User         @relation(fields: [owner_id], references: [id])
+
+  employees      Employee[]
+  services       Service[]
+}
+
+model Employee {
+  id             String        @id @default(uuid())
+  name           String
+  email          String
+  password       String
+  role           ROLE
+  phone_number   String
+
+  barbershop_id  String
+  barbershop     Barbershop    @relation(fields: [barbershop_id], references: [id])
+
+  appointments   Appointment[]
+  schedules      BarberSchedule[]
+}
+
+model Appointment {
+  id             String              @id @default(uuid())
+  client_name    String
+  client_contact String
+  datetime       DateTime
+  status         APPOINTMENT_STATUS  @default(PENDENTE)
+
+  barber_id      String
+  employee       Employee            @relation(fields: [barber_id], references: [id])
+
+  service_id     String
+  service        Service             @relation(fields: [service_id], references: [id])
+}
+
+model Service {
+  id              String        @id @default(uuid())
+  service_name    String
+  price           Float
+  time_taken      Int 
+
+  barbershop_id   String
+  barbershop      Barbershop    @relation(fields: [barbershop_id], references: [id])
+
+  appointments    Appointment[]
+}
+
+model BarberSchedule {
+  id             String         @id @default(uuid())
+  employee_id    String
+  employee       Employee       @relation(fields: [employee_id], references: [id])
+
+  days_of_week   Int[]
+  open_time      DateTime       @db.Time
+  close_time     DateTime       @db.Time
+
+  breaking_times BreakingTime[]
+}
+
+model BreakingTime {
+  id             String          @id @default(uuid())
+  schedule_id    String
+  schedule       BarberSchedule  @relation(fields: [schedule_id], references: [id])
+
+  starting_time  DateTime        @db.Time
+  ending_time    DateTime        @db.Time
+}
