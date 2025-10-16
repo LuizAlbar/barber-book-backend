@@ -90,4 +90,11 @@ export default class ResponseHandler {
     error.headers = { "WWW-Authenticate": "Bearer" };
     throw error;
   }
+
+  static error(reply: any, status: number, message: string, details?: any) {
+    return reply.status(status).send({
+      error: message,
+      details
+    });
+  }
 }
