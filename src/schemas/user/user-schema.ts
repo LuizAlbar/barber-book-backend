@@ -1,12 +1,12 @@
 import { z } from 'zod';
 
 export const signupUserSchema = z.object({
-  name: z.string().length(3, { message: "Name must be 3 characters long" }),
+  name: z.string().min(3, { message: "Name must be at least 3 characters long" }),
   email: z.email(),
-  password: z.string().length(8, { message: "Password must be 8 characters long" }),
+  password: z.string().min(8, { message: "Password must be at least 8 characters long" }),
 });
 
 export const loginUserSchema = z.object({
   email: z.email(),
-  password: z.string().length(8, {message: "Password must be 8 characters long"}),
+  password: z.string().min(8, {message: "Password must be at least 8 characters long"}),
 });
