@@ -137,3 +137,38 @@ export async function updateBarbershop(app: FastifyInstance, options: FastifyPlu
         }
     })
 }
+
+export async function deleteBarbershop(app: FastifyInstance, options: FastifyPluginOptions) {
+    app.delete('/barbershop/:id', { preHandler : authHook }, async(request, reply) => {
+        const user = request.user as {id: string};
+
+        if (!user) {
+            return ResponseHandler.error(reply, 401, 'Unauthorized');
+        }
+
+        const { id } = request.params as { id : string };
+
+        try {
+            const existingBarbershop = await prisma.barbershop.findFirst({
+                where : {
+                    id: id,
+                    user_id: user.id
+                }
+            });
+
+            if (!existingBarbershop) {
+                return ResponseHandler.error(reply, 404, 'Barbershop not found');
+            }
+
+            await prisma.barbershop.delete({
+                where: {
+                    id: id
+                }
+            });
+
+            return ResponseHandler.deleteSuccess(reply, existingBarbershop.name, existingBarbershop.id, existingBarbershop)
+        } catch (error) {
+            return ResponseHandler.error(reply, 500, 'Internal Server Error');
+        }
+    })
+}

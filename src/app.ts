@@ -5,10 +5,12 @@ import jwt from "@fastify/jwt";
 
 import { signupRoute} from "./routes/auth/signup";
 import { loginRoute } from "./routes/auth/login";
+// #----- Barbershop Routes -----#
 import { createBarbershopRoute } from "./routes/barbershop/barbershop";
 import { getAllBarbershopRoute } from "./routes/barbershop/barbershop";
 import { getBarbershopById } from "./routes/barbershop/barbershop";
 import { updateBarbershop } from "./routes/barbershop/barbershop";
+import { deleteBarbershop } from "./routes/barbershop/barbershop";
 
 
 
@@ -34,6 +36,7 @@ export async function buildApp() {
     app.register(getAllBarbershopRoute);
     app.register(getBarbershopById);
     app.register(updateBarbershop);
+    app.register(deleteBarbershop);
 
     return app;
 }
