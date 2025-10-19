@@ -6,6 +6,7 @@ import jwt from "@fastify/jwt";
 import { signupRoute} from "./routes/auth/signup";
 import { loginRoute } from "./routes/auth/login";
 import { createBarbershopRoute } from "./routes/barbershop/barbershop";
+import { getAllBarbershopRoute } from "./routes/barbershop/barbershop";
 
 
 
@@ -22,9 +23,13 @@ export async function buildApp() {
         secret: process.env.JWT_SECRET || "jwt"
     });
 
+    // #----- Authentication Routes : User -----#
     app.register(signupRoute);
     app.register(loginRoute);
+
+    // #----- Barbershop Routes -----#
     app.register(createBarbershopRoute);
+    app.register(getAllBarbershopRoute);
 
     return app;
 }

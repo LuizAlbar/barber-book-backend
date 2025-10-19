@@ -17,7 +17,7 @@ export async function createBarbershopRoute(app: FastifyInstance, options: Fasti
             const barbershop = await prisma.barbershop.create({
                 data: {
                     ...barbershopData,
-                    owner_id: userId
+                    user_id: userId
                 }
             });
 
@@ -34,4 +34,31 @@ export async function createBarbershopRoute(app: FastifyInstance, options: Fasti
             return ResponseHandler.error(reply, 500, 'Internal Server Error');
         }
     });
+}
+
+export async function getAllBarbershopRoute(app:FastifyInstance, options: FastifyPluginOptions) {
+    app.get('/barbershop', { preHandler : authHook }, async (request, reply) => {
+        const user = request.user as {id: string};
+
+        if (!user) {
+            return ResponseHandler.error(reply, 401, 'Unauthorized');
+        }
+        
+        try {
+            const barbershops = await prisma.barbershop.findMany({
+                where: {
+                    user_id: user.id
+                }
+            });
+
+            if (barbershops.length === 0 ) {
+                return ResponseHandler.error(reply, 404, 'No barbershop found');
+            }
+
+            return ResponseHandler.getAllSuccess(reply, 'barbershop', barbershops)
+        } catch (error) {
+            console.error('Error retrieving barbershops:', error);
+            return ResponseHandler.error(reply, 500, 'Internal Server Error');
+        }
+    })
 }
