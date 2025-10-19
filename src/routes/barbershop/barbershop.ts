@@ -5,7 +5,7 @@ import ResponseHandler from '../../utils/response-handler';
 
 import { prisma } from '../../database/prisma-service';
 
-import { createBarbershopSchema } from '../../schemas/barbershop/barbershop-schema';
+import { createBarbershopSchema, updateBarbershopSchema } from '../../schemas/barbershop/barbershop-schema';
 import { ZodError } from 'zod';
 
 export async function createBarbershopRoute(app: FastifyInstance, options: FastifyPluginOptions) {
@@ -91,4 +91,49 @@ export async function getBarbershopById(app: FastifyInstance, options: FastifyPl
         }
     })
     
+}
+
+export async function updateBarbershop(app: FastifyInstance, options: FastifyPluginOptions) {
+    app.put('/barbershop/:id', { preHandler : authHook }, async(request, reply) => {
+        const user = request.user as {id: string};
+
+        if (!user) {
+            return ResponseHandler.error(reply, 401, 'Unauthorized');
+        }
+
+        const { id } = request.params as { id : string };
+
+        try {
+            const barbershopData = updateBarbershopSchema.parse(request.body);
+            const existingBarbershop = await prisma.barbershop.findFirst({
+                where : {
+                    id: id,
+                    user_id: user.id
+                }
+            });
+
+            if (!existingBarbershop) {
+                return ResponseHandler.error(reply, 404, 'Barbershop not found');
+            }
+
+            const updatedBarbershop = await prisma.barbershop.update({
+                where: {
+                    id: id
+                },
+                data: barbershopData
+            });
+
+            return ResponseHandler.updateSuccess(reply, updatedBarbershop.name, updatedBarbershop.id, barbershopData)
+        } catch (error) {
+
+            if (error instanceof ZodError) {
+                const invalidFields = error.issues.map(err => ({
+                    field: err.path.join('.'),
+                    message: err.message
+                }));
+                return ResponseHandler.error(reply, 400, 'Invalid fields', invalidFields);
+            }
+            return ResponseHandler.error(reply, 500, 'Internal Server Error');
+        }
+    })
 }

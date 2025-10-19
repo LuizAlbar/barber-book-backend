@@ -25,3 +25,5 @@ export const createBarbershopSchema = z.object({
     .max(100, { message: "Landmark must be at most 100 characters long" })
     .optional()
 });
+
+export const updateBarbershopSchema = createBarbershopSchema.partial();

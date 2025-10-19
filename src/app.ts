@@ -8,6 +8,7 @@ import { loginRoute } from "./routes/auth/login";
 import { createBarbershopRoute } from "./routes/barbershop/barbershop";
 import { getAllBarbershopRoute } from "./routes/barbershop/barbershop";
 import { getBarbershopById } from "./routes/barbershop/barbershop";
+import { updateBarbershop } from "./routes/barbershop/barbershop";
 
 
 
@@ -32,6 +33,7 @@ export async function buildApp() {
     app.register(createBarbershopRoute);
     app.register(getAllBarbershopRoute);
     app.register(getBarbershopById);
+    app.register(updateBarbershop);
 
     return app;
 }
