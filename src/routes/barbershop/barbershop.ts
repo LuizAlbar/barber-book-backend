@@ -36,7 +36,7 @@ export async function createBarbershopRoute(app: FastifyInstance, options: Fasti
     });
 }
 
-export async function getAllBarbershopRoute(app:FastifyInstance, options: FastifyPluginOptions) {
+export async function getAllBarbershopRoute(app: FastifyInstance, options: FastifyPluginOptions) {
     app.get('/barbershop', { preHandler : authHook }, async (request, reply) => {
         const user = request.user as {id: string};
 
@@ -61,4 +61,34 @@ export async function getAllBarbershopRoute(app:FastifyInstance, options: Fastif
             return ResponseHandler.error(reply, 500, 'Internal Server Error');
         }
     })
+}
+
+export async function getBarbershopById(app: FastifyInstance, options: FastifyPluginOptions) {
+    app.get('/barbershop/:id', { preHandler : authHook }, async(request, reply) => {
+        const user = request.user as {id: string};
+
+        if (!user) {
+            return ResponseHandler.error(reply, 401, 'Unauthorized');
+        }
+        const { id } = request.params as { id : string };
+
+        try {
+            const barbershop = await prisma.barbershop.findFirst({
+                where : {
+                    id: id,
+                    user_id: user.id
+                }
+            })
+
+            if (!barbershop) {
+                return ResponseHandler.error(reply, 404, 'Barbershop not found');
+            }
+
+            return ResponseHandler.getSingleSuccess(reply, barbershop.name, barbershop.id, barbershop)
+
+        } catch (error) {
+            return ResponseHandler.error(reply, 500, 'Internal Server Error');
+        }
+    })
+    
 }

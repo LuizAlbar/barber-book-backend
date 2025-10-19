@@ -7,6 +7,7 @@ import { signupRoute} from "./routes/auth/signup";
 import { loginRoute } from "./routes/auth/login";
 import { createBarbershopRoute } from "./routes/barbershop/barbershop";
 import { getAllBarbershopRoute } from "./routes/barbershop/barbershop";
+import { getBarbershopById } from "./routes/barbershop/barbershop";
 
 
 
@@ -30,6 +31,7 @@ export async function buildApp() {
     // #----- Barbershop Routes -----#
     app.register(createBarbershopRoute);
     app.register(getAllBarbershopRoute);
+    app.register(getBarbershopById);
 
     return app;
 }
