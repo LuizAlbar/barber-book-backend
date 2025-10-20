@@ -25,6 +25,27 @@ import { getEmployeeById } from "./routes/employee/employee";
 import { updateEmployee } from "./routes/employee/employee";
 import { deleteEmployee } from "./routes/employee/employee";
 
+// #----- Service Routes -----#
+import { createServiceRoute } from "./routes/service/service";
+import { getAllServiceRoute } from "./routes/service/service";
+import { getServiceById } from "./routes/service/service";
+import { updateService } from "./routes/service/service";
+import { deleteService } from "./routes/service/service";
+
+// #----- Appointment Routes -----#
+import { createAppointmentRoute } from "./routes/appointment/appointment";
+import { getAllAppointmentRoute } from "./routes/appointment/appointment";
+import { getAppointmentById } from "./routes/appointment/appointment";
+import { updateAppointment } from "./routes/appointment/appointment";
+import { deleteAppointment } from "./routes/appointment/appointment";
+
+// #----- BreakingTime Routes -----#
+import { createBreakingTimeRoute } from "./routes/breakingtime/breakingtime";
+import { getAllBreakingTimeRoute } from "./routes/breakingtime/breakingtime";
+import { getBreakingTimeById } from "./routes/breakingtime/breakingtime";
+import { updateBreakingTime } from "./routes/breakingtime/breakingtime";
+import { deleteBreakingTime } from "./routes/breakingtime/breakingtime";
+
 
 
 
@@ -85,6 +106,27 @@ export async function buildApp() {
     app.register(getEmployeeById);
     app.register(updateEmployee);
     app.register(deleteEmployee);
+
+    // #----- Service Routes -----#
+    app.register(createServiceRoute);
+    app.register(getAllServiceRoute);
+    app.register(getServiceById);
+    app.register(updateService);
+    app.register(deleteService);
+
+    // #----- Appointment Routes -----#
+    app.register(createAppointmentRoute);
+    app.register(getAllAppointmentRoute);
+    app.register(getAppointmentById);
+    app.register(updateAppointment);
+    app.register(deleteAppointment);
+
+    // #----- BreakingTime Routes -----#
+    app.register(createBreakingTimeRoute);
+    app.register(getAllBreakingTimeRoute);
+    app.register(getBreakingTimeById);
+    app.register(updateBreakingTime);
+    app.register(deleteBreakingTime);
 
     return app;
 }
