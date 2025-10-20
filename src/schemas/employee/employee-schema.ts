@@ -7,6 +7,4 @@ export const createEmployeeSchema = z.object({
     barbershop_id: z.uuid()
 })
 
-export const updateEmployeeSchema = createEmployeeSchema.omit(
-    {barbershop_id: true, email: true})
-    .partial()
+export const updateEmployeeSchema = createEmployeeSchema.omit({barbershop_id: true}).partial()
