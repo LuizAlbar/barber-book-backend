@@ -4,12 +4,26 @@ import { authHook } from '../../middlewares/auth';
 import ResponseHandler from '../../utils/response-handler';
 
 import { prisma } from '../../database/prisma-service';
+import { FastifyTypedInstance } from '../../utils/types';
 
 import { createBarbershopSchema, updateBarbershopSchema } from '../../schemas/barbershop/barbershop-schema';
 import { ZodError } from 'zod';
+import { z } from 'zod';
 
-export async function createBarbershopRoute(app: FastifyInstance, options: FastifyPluginOptions) {
-    app.post('/barbershop', { preHandler: authHook }, async (request, reply) => {
+const idParamSchema = z.object({
+    id: z.uuid()
+});
+
+export async function createBarbershopRoute(app: FastifyTypedInstance, options: FastifyPluginOptions) {
+    app.post('/barbershop', {
+        preHandler: authHook,
+        schema: {
+            tags: ['barbershop'],
+            description: 'Create a new barbershop',
+            body: createBarbershopSchema,
+            security: [{ bearerAuth: [] }]
+        }
+    }, async (request, reply) => {
         try {
             const barbershopData = createBarbershopSchema.parse(request.body);
             const userId = (request.user as any).id;
@@ -36,8 +50,15 @@ export async function createBarbershopRoute(app: FastifyInstance, options: Fasti
     });
 }
 
-export async function getAllBarbershopRoute(app: FastifyInstance, options: FastifyPluginOptions) {
-    app.get('/barbershop', { preHandler : authHook }, async (request, reply) => {
+export async function getAllBarbershopRoute(app: FastifyTypedInstance, options: FastifyPluginOptions) {
+    app.get('/barbershop', {
+        preHandler: authHook,
+        schema: {
+            tags: ['barbershop'],
+            description: 'Get all barbershops',
+            security: [{ bearerAuth: [] }]
+        }
+    }, async (request, reply) => {
         const user = request.user as {id: string};
 
         if (!user) {
@@ -63,8 +84,16 @@ export async function getAllBarbershopRoute(app: FastifyInstance, options: Fasti
     })
 }
 
-export async function getBarbershopById(app: FastifyInstance, options: FastifyPluginOptions) {
-    app.get('/barbershop/:id', { preHandler : authHook }, async(request, reply) => {
+export async function getBarbershopById(app: FastifyTypedInstance, options: FastifyPluginOptions) {
+    app.get('/barbershop/:id', {
+        preHandler: authHook,
+        schema: {
+            tags: ['barbershop'],
+            description: 'Get barbershop by ID',
+            params: idParamSchema,
+            security: [{ bearerAuth: [] }]
+        }
+    }, async (request, reply) => {
         const user = request.user as {id: string};
 
         if (!user) {
@@ -93,8 +122,17 @@ export async function getBarbershopById(app: FastifyInstance, options: FastifyPl
     
 }
 
-export async function updateBarbershop(app: FastifyInstance, options: FastifyPluginOptions) {
-    app.put('/barbershop/:id', { preHandler : authHook }, async(request, reply) => {
+export async function updateBarbershop(app: FastifyTypedInstance, options: FastifyPluginOptions) {
+    app.put('/barbershop/:id', {
+        preHandler: authHook,
+        schema: {
+            tags: ['barbershop'],
+            description: 'Update barbershop',
+            params: idParamSchema,
+            body: updateBarbershopSchema,
+            security: [{ bearerAuth: [] }]
+        }
+    }, async (request, reply) => {
         const user = request.user as {id: string};
 
         if (!user) {
@@ -138,8 +176,16 @@ export async function updateBarbershop(app: FastifyInstance, options: FastifyPlu
     })
 }
 
-export async function deleteBarbershop(app: FastifyInstance, options: FastifyPluginOptions) {
-    app.delete('/barbershop/:id', { preHandler : authHook }, async(request, reply) => {
+export async function deleteBarbershop(app: FastifyTypedInstance, options: FastifyPluginOptions) {
+    app.delete('/barbershop/:id', {
+        preHandler: authHook,
+        schema: {
+            tags: ['barbershop'],
+            description: 'Delete barbershop',
+            params: idParamSchema,
+            security: [{ bearerAuth: [] }]
+        }
+    }, async (request, reply) => {
         const user = request.user as {id: string};
 
         if (!user) {

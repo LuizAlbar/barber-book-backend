@@ -13,7 +13,9 @@ export const createBarbershopSchema = z.object({
 
   address_number: z
     .string()
-    .regex(/^\d+[A-Za-z]?$/, { message: "Address number must be numeric (e.g. 123 or 123A)" }),
+    .min(1, { message: "Address number is required" })
+    .max(8, { message: "Address number must be at most 8 characters" })
+    .describe("Address number (e.g. 123 or 123A)"),
 
   neighbourhood: z
     .string()

@@ -1,10 +1,16 @@
-import Fastify  from "fastify";
+import { fastify } from "fastify";
 import helmet from "@fastify/helmet";
 import cors from "@fastify/cors";
 import jwt from "@fastify/jwt";
 
+import { validatorCompiler, serializerCompiler, type ZodTypeProvider, jsonSchemaTransform} from "fastify-type-provider-zod";
+import { fastifySwagger } from "@fastify/swagger";
+import { fastifySwaggerUi } from "@fastify/swagger-ui";
+
+// #----- Authentication Routes -----#
 import { signupRoute} from "./routes/auth/signup";
 import { loginRoute } from "./routes/auth/login";
+
 // #----- Barbershop Routes -----#
 import { createBarbershopRoute } from "./routes/barbershop/barbershop";
 import { getAllBarbershopRoute } from "./routes/barbershop/barbershop";
@@ -12,15 +18,20 @@ import { getBarbershopById } from "./routes/barbershop/barbershop";
 import { updateBarbershop } from "./routes/barbershop/barbershop";
 import { deleteBarbershop } from "./routes/barbershop/barbershop";
 
+// #----- Employee Routes -----#
 import { createEmployeeRoute } from "./routes/employee/employee";
 import { getAllEmployeeRoute } from "./routes/employee/employee";
+import { getEmployeeById } from "./routes/employee/employee";  
+import { updateEmployee } from "./routes/employee/employee";
+import { deleteEmployee } from "./routes/employee/employee";
+
 
 
 
 export async function buildApp() {
-    const app  = Fastify({
+    const app  = fastify({
         logger: true,
-    });
+    }).withTypeProvider<ZodTypeProvider>();
 
     await app.register(helmet);
     await app.register(cors, {
@@ -29,6 +40,33 @@ export async function buildApp() {
     await app.register(jwt, {
         secret: process.env.JWT_SECRET || "jwt"
     });
+
+    app.setValidatorCompiler(validatorCompiler);
+    app.setSerializerCompiler(serializerCompiler);
+
+    app.register(fastifySwagger, {
+        openapi: {
+            info: {
+                title: "BarberShop API",
+                description: "BarberShop API",
+                version: "0.1.0"
+            },
+            components: {
+                securitySchemes: {
+                    bearerAuth: {
+                        type: 'http',
+                        scheme: 'bearer',
+                        bearerFormat: 'JWT'
+                    }
+                }
+            }
+        },
+        transform: jsonSchemaTransform
+    })
+
+    app.register(fastifySwaggerUi, {
+        routePrefix: "/docs"
+    })
 
     // #----- Authentication Routes : User -----#
     app.register(signupRoute);
@@ -41,8 +79,12 @@ export async function buildApp() {
     app.register(updateBarbershop);
     app.register(deleteBarbershop);
 
+    // #----- Employee Routes -----#
     app.register(createEmployeeRoute);
     app.register(getAllEmployeeRoute);
+    app.register(getEmployeeById);
+    app.register(updateEmployee);
+    app.register(deleteEmployee);
 
     return app;
 }
