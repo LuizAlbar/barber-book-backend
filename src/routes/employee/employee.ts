@@ -5,11 +5,27 @@ import ResponseHandler from '../../utils/response-handler';
 
 import { prisma } from '../../database/prisma-service';
 
+import { FastifyTypedInstance } from '../../utils/types';
+
 import { createEmployeeSchema, updateEmployeeSchema } from '../../schemas/employee/employee-schema';
 import { ZodError } from 'zod';
+import { z } from 'zod';
 
-export async function createEmployeeRoute(app: FastifyInstance, options: FastifyPluginOptions) {
-    app.post('/employee', { preHandler: authHook }, async (request, reply) => {
+const idParamSchema = z.object({
+    id: z.uuid()
+});
+
+export async function createEmployeeRoute(app: FastifyTypedInstance, options: FastifyPluginOptions) {
+    app.post('/employee',
+        { preHandler: authHook,
+        schema:{
+            tags: ['employee'],
+            description: 'Create a new employee',
+            body: createEmployeeSchema,
+            security: [{ bearerAuth: [] }]
+        }},
+        async (request, reply) => {
+
         try {
             const employeeData = createEmployeeSchema.parse(request.body);
             const userId = (request.user as any).id;
@@ -70,8 +86,16 @@ export async function createEmployeeRoute(app: FastifyInstance, options: Fastify
     });
 }
 
-export async function getAllEmployeeRoute(app: FastifyInstance, options: FastifyPluginOptions) {
-    app.get('/employee', { preHandler: authHook }, async (request, reply) => {
+export async function getAllEmployeeRoute(app: FastifyTypedInstance, options: FastifyPluginOptions) {
+    app.get('/employee',
+        { preHandler: authHook,
+        schema : {
+            tags: ['employee'],
+            description: 'Get all employees',
+            security: [{ bearerAuth: [] }]
+        }},
+        async (request, reply) => {
+
         const user = request.user as {id: string};
 
         if (!user) {
@@ -101,8 +125,16 @@ export async function getAllEmployeeRoute(app: FastifyInstance, options: Fastify
     });
 }
 
-export async function getEmployeeById(app: FastifyInstance, options: FastifyPluginOptions) {
-    app.get('/employee/:id', { preHandler: authHook }, async (request, reply) => {
+export async function getEmployeeById(app: FastifyTypedInstance, options: FastifyPluginOptions) {
+    app.get('/employee/:id', {
+        preHandler: authHook,
+        schema: {
+            tags: ['employee'],
+            description: 'Get employee by ID',
+            params: idParamSchema,
+            security: [{ bearerAuth: [] }]
+        }
+    }, async (request, reply) => {
         const user = request.user as {id: string};
 
         if (!user) {
@@ -135,8 +167,17 @@ export async function getEmployeeById(app: FastifyInstance, options: FastifyPlug
     });
 }
 
-export async function updateEmployee(app: FastifyInstance, options: FastifyPluginOptions) {
-    app.put('/employee/:id', { preHandler: authHook }, async (request, reply) => {
+export async function updateEmployee(app: FastifyTypedInstance, options: FastifyPluginOptions) {
+    app.put('/employee/:id', {
+        preHandler: authHook,
+        schema: {
+            tags: ['employee'],
+            description: 'Update employee',
+            params: idParamSchema,
+            body: updateEmployeeSchema,
+            security: [{ bearerAuth: [] }]
+        }
+    }, async (request, reply) => {
         const user = request.user as {id: string};
 
         if (!user) {
@@ -189,8 +230,16 @@ export async function updateEmployee(app: FastifyInstance, options: FastifyPlugi
     });
 }
 
-export async function deleteEmployee(app: FastifyInstance, options: FastifyPluginOptions) {
-    app.delete('/employee/:id', { preHandler: authHook }, async (request, reply) => {
+export async function deleteEmployee(app: FastifyTypedInstance, options: FastifyPluginOptions) {
+    app.delete('/employee/:id', {
+        preHandler: authHook,
+        schema: {
+            tags: ['employee'],
+            description: 'Delete employee',
+            params: idParamSchema,
+            security: [{ bearerAuth: [] }]
+        }
+    }, async (request, reply) => {
         const user = request.user as {id: string};
 
         if (!user) {
