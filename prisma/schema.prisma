@@ -26,6 +26,7 @@ model User {
   updated_at   DateTime     @updatedAt
 
   barbershops  Barbershop[]
+  employee     Employee?
 }
 
 model Barbershop {
@@ -48,11 +49,11 @@ model Barbershop {
 
 model Employee {
   id             String        @id @default(uuid())
-  name           String
-  email          String
-  password       String
   role           ROLE
   phone_number   String
+
+  user_id        String        @unique
+  user           User          @relation(fields: [user_id], references: [id])
 
   barbershop_id  String
   barbershop     Barbershop    @relation(fields: [barbershop_id], references: [id])
