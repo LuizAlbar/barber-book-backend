@@ -4,13 +4,20 @@ import { compare } from 'bcrypt';
 import ResponseHandler from '../../utils/response-handler';
 
 import { prisma } from '../../database/prisma-service';
+import { FastifyTypedInstance } from '../../utils/types';
 
 import { loginUserSchema } from '../../schemas/user/user-schema';
 import { ZodError } from 'zod';
 
 
-export async function loginRoute(app: FastifyInstance, options: FastifyPluginOptions) {
-  app.post('/login', async (request, reply) => {
+export async function loginRoute(app: FastifyTypedInstance, options: FastifyPluginOptions) {
+  app.post('/login', {
+    schema: {
+      tags: ['auth'],
+      description: 'User login',
+      body: loginUserSchema
+    }
+  }, async (request, reply) => {
     try {
       const { email, password} = loginUserSchema.parse(request.body);
 
@@ -40,7 +47,13 @@ export async function loginRoute(app: FastifyInstance, options: FastifyPluginOpt
     }
   });
 
-  app.post('/login/me', async (request, reply) => {
+  app.post('/login/me', {
+    schema: {
+      tags: ['auth'],
+      description: 'Get authenticated user info',
+      security: [{ bearerAuth: [] }]
+    }
+  }, async (request, reply) => {
     try {
         const token = request.headers.authorization?.split(' ')[1];
         if (!token) {

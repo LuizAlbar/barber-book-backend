@@ -4,13 +4,20 @@ import { hash } from 'bcrypt';
 import  ResponseHandler  from '../../utils/response-handler';
 
 import { prisma } from '../../database/prisma-service';
+import { FastifyTypedInstance } from '../../utils/types';
 
 import { signupUserSchema } from '../../schemas/user/user-schema';
 import { ZodError } from 'zod';
 
 
-export async function signupRoute(app: FastifyInstance, options: FastifyPluginOptions) {
-  app.post('/signup', async (request, reply) => {
+export async function signupRoute(app: FastifyTypedInstance, options: FastifyPluginOptions) {
+  app.post('/signup', {
+    schema: {
+      tags: ['auth'],
+      description: 'User registration',
+      body: signupUserSchema
+    }
+  }, async (request, reply) => {
     try {
       const { name, email, password } = signupUserSchema.parse(request.body);
 
