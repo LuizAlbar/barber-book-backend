@@ -15,6 +15,7 @@ enum ROLE {
 enum APPOINTMENT_STATUS {
   PENDENTE
   COMPLETO
+  CANCELADO
 }
 
 model User {
@@ -69,8 +70,8 @@ model Appointment {
   datetime       DateTime
   status         APPOINTMENT_STATUS  @default(PENDENTE)
 
-  barber_id      String
-  employee       Employee            @relation(fields: [barber_id], references: [id])
+  employee_id      String
+  employee       Employee            @relation(fields: [employee_id], references: [id])
 
   service_id     String
   service        Service             @relation(fields: [service_id], references: [id])
