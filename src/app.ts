@@ -3,6 +3,10 @@ import helmet from "@fastify/helmet";
 import cors from "@fastify/cors";
 import jwt from "@fastify/jwt";
 
+import { validatorCompiler, serializerCompiler } from "fastify-type-provider-zod";
+import { fastifySwagger } from "@fastify/swagger";
+import { fastifySwaggerUi } from "@fastify/swagger-ui";
+
 // #----- Authentication Routes -----#
 import { signupRoute} from "./routes/auth/signup";
 import { loginRoute } from "./routes/auth/login";
@@ -35,6 +39,23 @@ export async function buildApp() {
     await app.register(jwt, {
         secret: process.env.JWT_SECRET || "jwt"
     });
+
+    app.setValidatorCompiler(validatorCompiler);
+    app.setSerializerCompiler(serializerCompiler);
+
+    app.register(fastifySwagger, {
+        openapi: {
+            info: {
+                title: "BarberShop API",
+                description: "BarberShop API",
+                version: "0.1.0"
+            }
+        }
+    })
+
+    app.register(fastifySwaggerUi, {
+        routePrefix: "/docs"
+    })
 
     // #----- Authentication Routes : User -----#
     app.register(signupRoute);
