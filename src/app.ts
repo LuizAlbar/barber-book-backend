@@ -12,6 +12,9 @@ import { getBarbershopById } from "./routes/barbershop/barbershop";
 import { updateBarbershop } from "./routes/barbershop/barbershop";
 import { deleteBarbershop } from "./routes/barbershop/barbershop";
 
+import { createEmployeeRoute } from "./routes/employee/employee";
+import { getAllEmployeeRoute } from "./routes/employee/employee";
+
 
 
 export async function buildApp() {
@@ -37,6 +40,9 @@ export async function buildApp() {
     app.register(getBarbershopById);
     app.register(updateBarbershop);
     app.register(deleteBarbershop);
+
+    app.register(createEmployeeRoute);
+    app.register(getAllEmployeeRoute);
 
     return app;
 }
