@@ -3,8 +3,10 @@ import helmet from "@fastify/helmet";
 import cors from "@fastify/cors";
 import jwt from "@fastify/jwt";
 
+// #----- Authentication Routes -----#
 import { signupRoute} from "./routes/auth/signup";
 import { loginRoute } from "./routes/auth/login";
+
 // #----- Barbershop Routes -----#
 import { createBarbershopRoute } from "./routes/barbershop/barbershop";
 import { getAllBarbershopRoute } from "./routes/barbershop/barbershop";
@@ -12,8 +14,12 @@ import { getBarbershopById } from "./routes/barbershop/barbershop";
 import { updateBarbershop } from "./routes/barbershop/barbershop";
 import { deleteBarbershop } from "./routes/barbershop/barbershop";
 
+// #----- Employee Routes -----#
 import { createEmployeeRoute } from "./routes/employee/employee";
 import { getAllEmployeeRoute } from "./routes/employee/employee";
+import { getEmployeeById } from "./routes/employee/employee";  
+import { updateEmployee } from "./routes/employee/employee";
+import { deleteEmployee } from "./routes/employee/employee";
 
 
 
@@ -41,8 +47,12 @@ export async function buildApp() {
     app.register(updateBarbershop);
     app.register(deleteBarbershop);
 
+    // #----- Employee Routes -----#
     app.register(createEmployeeRoute);
     app.register(getAllEmployeeRoute);
+    app.register(getEmployeeById);
+    app.register(updateEmployee);
+    app.register(deleteEmployee);
 
     return app;
 }

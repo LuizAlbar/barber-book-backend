@@ -100,3 +100,131 @@ export async function getAllEmployeeRoute(app: FastifyInstance, options: Fastify
         }
     });
 }
+
+export async function getEmployeeById(app: FastifyInstance, options: FastifyPluginOptions) {
+    app.get('/employee/:id', { preHandler: authHook }, async (request, reply) => {
+        const user = request.user as {id: string};
+
+        if (!user) {
+            return ResponseHandler.error(reply, 401, 'Unauthorized');
+        }
+
+        const { id } = request.params as { id: string };
+
+        try {
+            const employee = await prisma.employee.findFirst({
+                where: {
+                    id: id,
+                    barbershop: {
+                        user_id: user.id
+                    }
+                },
+                include: {
+                    user: true
+                }
+            });
+
+            if (!employee) {
+                return ResponseHandler.error(reply, 404, 'Employee not found');
+            }
+
+            return ResponseHandler.getSingleSuccess(reply, employee.user.name, employee.id, employee);
+        } catch (error) {
+            return ResponseHandler.error(reply, 500, 'Internal Server Error');
+        }
+    });
+}
+
+export async function updateEmployee(app: FastifyInstance, options: FastifyPluginOptions) {
+    app.put('/employee/:id', { preHandler: authHook }, async (request, reply) => {
+        const user = request.user as {id: string};
+
+        if (!user) {
+            return ResponseHandler.error(reply, 401, 'Unauthorized');
+        }
+
+        const { id } = request.params as { id: string };
+
+        try {
+            const employeeData = updateEmployeeSchema.parse(request.body);
+
+            const existingEmployee = await prisma.employee.findFirst({
+                where: {
+                    id: id,
+                    barbershop: {
+                        user_id: user.id
+                    }
+                },
+                include: {
+                    user: true
+                }
+            });
+
+            if (!existingEmployee) {
+                return ResponseHandler.error(reply, 404, 'Employee not found');
+            }
+
+            const updatedEmployee = await prisma.employee.update({
+                where: {
+                    id: id
+                },
+                data: employeeData,
+                include: {
+                    user: true,
+                    barbershop: true
+                }
+            });
+
+            return ResponseHandler.updateSuccess(reply, updatedEmployee.user.name, updatedEmployee.id, updatedEmployee);
+        } catch (error) {
+            if (error instanceof ZodError) {
+                const invalidFields = error.issues.map(err => ({
+                    field: err.path.join('.'),
+                    message: err.message
+                }));
+                return ResponseHandler.error(reply, 400, 'Invalid fields', invalidFields);
+            }
+            return ResponseHandler.error(reply, 500, 'Internal Server Error');
+        }
+    });
+}
+
+export async function deleteEmployee(app: FastifyInstance, options: FastifyPluginOptions) {
+    app.delete('/employee/:id', { preHandler: authHook }, async (request, reply) => {
+        const user = request.user as {id: string};
+
+        if (!user) {
+            return ResponseHandler.error(reply, 401, 'Unauthorized');
+        }
+
+        const { id } = request.params as { id: string };
+
+        try {
+            const existingEmployee = await prisma.employee.findFirst({
+                where: {
+                    id: id,
+                    barbershop: {
+                        user_id: user.id
+                    }
+                },
+                include: {
+                    user: true
+                }
+            });
+
+            if (!existingEmployee) {
+                return ResponseHandler.error(reply, 404, 'Employee not found');
+            }
+
+            await prisma.employee.delete({
+                where: {
+                    id: id
+                }
+            });
+
+            return ResponseHandler.deleteSuccess(reply, existingEmployee.user.name, existingEmployee.id, existingEmployee);
+        } catch (error) {
+            return ResponseHandler.error(reply, 500, 'Internal Server Error');
+        }
+    });
+}
