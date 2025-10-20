@@ -1,9 +1,9 @@
-import Fastify  from "fastify";
+import { fastify } from "fastify";
 import helmet from "@fastify/helmet";
 import cors from "@fastify/cors";
 import jwt from "@fastify/jwt";
 
-import { validatorCompiler, serializerCompiler } from "fastify-type-provider-zod";
+import { validatorCompiler, serializerCompiler, type ZodTypeProvider, jsonSchemaTransform} from "fastify-type-provider-zod";
 import { fastifySwagger } from "@fastify/swagger";
 import { fastifySwaggerUi } from "@fastify/swagger-ui";
 
@@ -27,10 +27,11 @@ import { deleteEmployee } from "./routes/employee/employee";
 
 
 
+
 export async function buildApp() {
-    const app  = Fastify({
+    const app  = fastify({
         logger: true,
-    });
+    }).withTypeProvider<ZodTypeProvider>();
 
     await app.register(helmet);
     await app.register(cors, {
@@ -49,8 +50,18 @@ export async function buildApp() {
                 title: "BarberShop API",
                 description: "BarberShop API",
                 version: "0.1.0"
+            },
+            components: {
+                securitySchemes: {
+                    bearerAuth: {
+                        type: 'http',
+                        scheme: 'bearer',
+                        bearerFormat: 'JWT'
+                    }
+                }
             }
-        }
+        },
+        transform: jsonSchemaTransform
     })
 
     app.register(fastifySwaggerUi, {
